@@ -15,41 +15,56 @@ class Main:
             operacion4 = self.elevar(x, operacion2) # x^(2n+1)
             operacion5 = operacion4/operacion3 # Fraccion
             if n % 2 == 0: #(-1)^n
-                ans += operacion5
+                ans_actual += operacion5
             else:
-                ans -= operacion5
+                ans_actual -= operacion5
             n += 1
             error = abs(ans_actual - ans_previa)
             if error < error_permitido: break
-        return ans
+            ans_previa = ans_actual
+        return ans_actual
     
     def cos(self, x: float) -> float:
-        n = 16
-        ans = 0
-        while n >= 0:
+        ans_actual = 0
+        ans_previa = 0
+        error = 0
+        error_permitido = 0.001
+        n = 0
+        while True:
             operacion1 = 2 * n #2n
             operacion2 = self.factorial(operacion1) #(2n)!
-            operacion3 = self.elevar(x, operacion1) # x^(2n+1)
+            operacion3 = self.elevar(x, operacion1)
             operacion4 = operacion3/operacion2
             if n % 2 == 0: #(-1)^n
-                ans += operacion4
+                ans_actual += operacion4
             else:
-                ans -= operacion4
-            n -= 1
-        return ans
+                ans_actual -= operacion4
+            n += 1
+            error = abs(ans_actual - ans_previa)
+            if error < error_permitido: break
+            ans_previa = ans_actual
+        return ans_actual
     
     def tg(self, x: float) -> float:
+        if self.cos(x) == 0 and self.sen(x) > 0: return float('inf')
+        if self.cos(x) == 0 and self.sen(x) < 0: return float('-inf')
         return self.sin(x)/self.cos(x)
     
     def e(self) -> float:
-        n = 6
-        ans = 0
-        while n >= 0:
+        ans_actual = 0
+        ans_previa = 0
+        error = 0
+        error_permitido = 0.001
+        n = 0
+        while True:
             operacion1 = self.factorial(n) # n!
-            operacion2 = 1/operacion1 # 1/n!
-            ans += operacion2
-            n -= 1
-        return ans
+            operacion2 = 1/operacion1
+            ans_actual += operacion2
+            n += 1
+            error = abs(ans_actual - ans_previa)
+            if error < error_permitido: break
+            ans_previa = ans_actual
+        return ans_actual
             
 
     @staticmethod
@@ -89,10 +104,10 @@ class Test(Main):
 
     def test_elevar(self):
         print("Test elevar: ")
-        for i in range(0, 10):
+        for i in self.frange(0, 10, 0.1):
             for j in range(0, 10):
-                esp = i**j
-                res = self.elevar(i, j)
+                esp = round(i**j, 4)
+                res = round(self.elevar(i, j), 4)
                 print(f"{i}^{j} Esperado: {esp} Real: {res}, {esp == res}")
         return
 
@@ -107,25 +122,25 @@ class Test(Main):
     def test_sin(self, inicial: int, final: int) -> None:
         print("Test de seno: ")
         for i in self.frange(inicial, final, 0.1):
-            esp = round(math.sin(i), 3)
-            res = round(self.sin(i), 3)
-            print(f"Sen({i}) Esperado: {esp} Resultado: {res}, {esp == res}")
+            esp = round(math.sin(i), 4)
+            res = round(self.sin(i), 4)
+            print(f"Sen({i}) Esperado: {esp} Resultado: {res}, {esp + 0.001 >= res >= esp - 0.001}")
         return
     
     def test_cos(self, inicial: int, final: int) -> None:
         print("Test de coseno: ")
         for i in self.frange(inicial, final, 0.1):
-            esp = round(math.cos(i), 3)
-            res = round(self.cos(i), 3)
-            print(f"Cos({i}) Esperado: {esp} Resultado: {res}, {esp == res}")
+            esp = round(math.cos(i), 4)
+            res = round(self.cos(i), 4)
+            print(f"Cos({i}) Esperado: {esp} Resultado: {res}, {esp + 0.001 >= res >= esp - 0.001}")
         return
     
     def test_tg(self, inicial: int, final: int) -> None:
         print("Test de tangente: ")
         for i in self.frange(inicial, final, 0.1):
-            esp = round(math.tan(i), 3)
-            res = round(self.tg(i), 3)
-            print(f"Tg({i}) Esperado: {esp} Resultado: {res}, {esp == res}")
+            esp = round(math.tan(i), 4)
+            res = round(self.tg(i), 4)
+            print(f"Tg({i}) Esperado: {esp} Resultado: {res}, {esp + 0.001 >= res >= esp - 0.001}")
         return
     
     def test_e(self) -> None:
@@ -137,9 +152,9 @@ class Test(Main):
 
 
 # Test.test_factorial(Test(), 1, 10)
-# Test.test_elevar(Test())
-Test.test_sin(Test(), -10, 10)
+Test.test_elevar(Test())
+# Test.test_sin(Test(), -10, 10)
 # Test.test_cos(Test(), -10, 10)
 # Test.test_tg(Test(), -10, 10)
-# Test.test_e(Test())
+Test.test_e(Test())
 
