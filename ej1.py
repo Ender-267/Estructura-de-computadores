@@ -3,10 +3,12 @@ import math
 
 class Main:
     def sin(self, x: float) -> float:
-        # Calcular n
-        n = 16
-        ans = 0
-        while n >= 0:
+        ans_actual = 0
+        ans_previa = 0
+        error = 0
+        error_permitido = 0.001
+        n = 0
+        while True:
             operacion1 = 2 * n #2n
             operacion2 = operacion1 + 1 #2n+1
             operacion3 = self.factorial(operacion2) #(2n+1)!
@@ -16,7 +18,9 @@ class Main:
                 ans += operacion5
             else:
                 ans -= operacion5
-            n -= 1
+            n += 1
+            error = abs(ans_actual - ans_previa)
+            if error < error_permitido: break
         return ans
     
     def cos(self, x: float) -> float:
@@ -134,8 +138,8 @@ class Test(Main):
 
 # Test.test_factorial(Test(), 1, 10)
 # Test.test_elevar(Test())
-# Test.test_sin(Test(), -10, 10)
+Test.test_sin(Test(), -10, 10)
 # Test.test_cos(Test(), -10, 10)
 # Test.test_tg(Test(), -10, 10)
-Test.test_e(Test())
+# Test.test_e(Test())
 
