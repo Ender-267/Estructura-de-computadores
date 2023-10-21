@@ -1,15 +1,14 @@
 .data
 	.align 2
 error: .float 0.001
-a:	   .float 3
+a:	   .float 2
 b:	   .float 2
 
 .text
 main:
 	la s0 a
     flw fa0 0(s0)
-    li a0 3
-    jal ra elevar
+    jal ra sin
     # Finalizar programa
     li a7 10
     ecall
@@ -45,7 +44,7 @@ sin: #sin(x)
         jal ra elevar                   # elevar(x, 2n+1) => fa0 = x^(2n+1)
         # Pierdo valores de ft0 y ft1 al llamar a elevar()
         fmv.s ft2 fa0                   # ft2 = fa0 = x^(2n+1)
-        fmv.w.x ft5 t5                  # ft5 = ft2 = (2n+1)!
+        fcvt.s.w ft5 t5                  # ft5 = ft2 = (2n+1)!
         fdiv.s ft2 ft2 ft5              # ft2 = ft2/ft5 =(x^(2n+1))/(2n+1)!
         rem t4 t3 t6                    # t4 = t3 % t6 = n % 2
         bne t4 zero sin_else            # if n % 2 == 0:
