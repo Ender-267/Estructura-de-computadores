@@ -152,9 +152,10 @@ class Test(Main):
 
 
 # Test.test_factorial(Test(), 1, 10)
-Test.test_elevar(Test())
+# Test.test_elevar(Test())
 # Test.test_sin(Test(), -10, 10)
 # Test.test_cos(Test(), -10, 10)
 # Test.test_tg(Test(), -10, 10)
-Test.test_e(Test())
+# Test.test_e(Test())
+print(Main.factorial(13))
 
