@@ -45,7 +45,7 @@ sin: #sin(x)
         jal ra elevar                   # elevar(x, 2n+1) => fa0 = x^(2n+1)
         # Pierdo valores de ft0 y ft1 al llamar a elevar()
         fmv.s ft2 fa0                   # ft2 = fa0 = x^(2n+1)
-        fmv.x.w ft5 t5                  # ft5 = ft2 = (2n+1)!
+        fmv.w.x ft5 t5                  # ft5 = ft2 = (2n+1)!
         fdiv.s ft2 ft2 ft5              # ft2 = ft2/ft5 =(x^(2n+1))/(2n+1)!
         rem t4 t3 t6                    # t4 = t3 % t6 = n % 2
         bne t4 zero sin_else            # if n % 2 == 0:
@@ -65,15 +65,15 @@ sin: #sin(x)
         li t1 0
         li t2 0
         li t6 0
-        fmv.x.w ft0 zero
-        fmv.x.w ft1 zero
-        fmv.x.w ft2 zero
-        fmv.x.w ft3 zero
-        fmv.x.w ft4 zero
-        fmv.x.w ft5 zero
-        fmv.x.w ft6 zero
-        fmv.x.w ft7 zero
-        fmv.x.w ft8 zero
+        fmv.w.x ft0 zero
+        fmv.w.x ft1 zero
+        fmv.w.x ft2 zero
+        fmv.w.x ft3 zero
+        fmv.w.x ft4 zero
+        fmv.w.x ft5 zero
+        fmv.w.x ft6 zero
+        fmv.w.x ft7 zero
+        fmv.w.x ft8 zero
         jr ra                           # Return
 
 
@@ -97,8 +97,8 @@ elevar: #x^n; x = fa0; n = a0; Solo admite positivos y n enteros; Usa registros 
         # Resetear registros temporales
         li t0 0
         li t1 0
-        fmv.x.w ft0 zero
-        fmv.x.w ft1 zero
+        fmv.w.x ft0 zero
+        fmv.w.x ft1 zero
         jr ra
 factorial: #x!; a0 = x Solo admite enteros; Usa registros t0 t1 t2
 	mv t0 a0 						    # t0 = x
