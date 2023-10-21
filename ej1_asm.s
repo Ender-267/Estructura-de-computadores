@@ -1,16 +1,88 @@
 .data
 	.align 2
 error: .float 0.001
-a:	   .float -2
 pi:	   .word 0x40490FDB
+prueba1: .float -2
+prueba2: .float -1.5
+prueba3: .float -1
+prueba4: .float -0.5
+prueba5: .float 0
+prueba6: .float 0.5
+prueba7: .float 1
+prueba8: .float 1.5
+prueba9: .float 2
+
 .text
 main:
+# Pruebas (usar breaks)
     la s0 pi
-    la s1 a
     flw fs0 0(s0)	# pi
-    flw fs1 0(s1)	#2
-    fmul.s fa0 fs0 fs1
+
+    la s1 prueba1
+    flw fs1 0(s1)
+    fmv.s fa0 fs1           # -2
     jal ra sin
+    fmul.s fa0 fs0 fs1      # -2pi
+    jal ra sin
+
+    la s1 prueba2
+    flw fs1 0(s1)
+    fmv.s fa0 fs1           # -1.5
+    jal ra sin
+    fmul.s fa0 fs0 fs1      # -1.5pi
+    jal ra sin
+
+    la s1 prueba3
+    flw fs1 0(s1)
+    fmv.s fa0 fs1           # -1
+    jal ra sin
+    fmul.s fa0 fs0 fs1      # -1pi
+    jal ra sin
+
+    la s1 prueba4
+    flw fs1 0(s1)
+    fmv.s fa0 fs1           # -0.5
+    jal ra sin
+    fmul.s fa0 fs0 fs1      # -0.5pi
+    jal ra sin
+
+    la s1 prueba5
+    flw fs1 0(s1)
+    fmv.s fa0 fs1           # 0
+    jal ra sin
+    fmul.s fa0 fs0 fs1      # 0pi
+    jal ra sin
+
+    la s1 prueba6
+    flw fs1 0(s1)           # 0.5
+    fmv.s fa0 fs1           
+    jal ra sin
+    fmul.s fa0 fs0 fs1      # 0.5pi
+    jal ra sin
+
+    la s1 prueba7
+    flw fs1 0(s1)
+    fmv.s fa0 fs1           # 1
+    jal ra sin
+    fmul.s fa0 fs0 fs1      # 1pi
+    jal ra sin
+
+    la s1 prueba8
+    flw fs1 0(s1)
+    fmv.s fa0 fs1           # 1.5
+    jal ra sin
+    fmul.s fa0 fs0 fs1      # 1.5pi
+    jal ra sin
+
+    la s1 prueba9
+    flw fs1 0(s1)           # 2
+    fmv.s fa0 fs1
+    jal ra sin
+    fmul.s fa0 fs0 fs1      # 2pi
+    jal ra sin
+
+
+
     # Finalizar programa
     li a7 10
     ecall
@@ -81,6 +153,8 @@ sin: #sin(x)
         fmv.w.x ft7 zero
         fmv.w.x ft8 zero
         jr ra                           # Return
+
+
 
 
 # Funciones auxiliares
