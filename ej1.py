@@ -18,10 +18,10 @@ class Main:
                 ans_actual += operacion5
             else:
                 ans_actual -= operacion5
-            n += 1
             error = abs(ans_actual - ans_previa)
             if error < error_permitido: break
             ans_previa = ans_actual
+            n += 1
         return ans_actual
     
     def cos(self, x: float) -> float:

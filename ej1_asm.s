@@ -1,53 +1,87 @@
 .data
 	.align 2
-error: .float 0,001
-a:	   .float 2.2
-b:	   .float 5
+error: .float 0.001
+a:	   .float 3
+b:	   .float 2
 
 .text
 main:
 	la s0 a
-	flw fa0 0(s0)
-    la s0 b
-    li a0 4
+    flw fa0 0(s0)
+    li a0 3
     jal ra elevar
     # Finalizar programa
     li a7 10
     ecall
 # Funciones solucion
 sin: #sin(x)
-	fmv.s ft0 fa0						# ft0 = fa0
+    # ft0 y ft1 son usados por elevar()
+    # ft7 = x
+    # ft8 = 0.001; Error
+    # t0, t1, t2 son usados por elevar y factorial
+    # t3 = n; variable contador
+    # t4; Operaciones de sin con enteros
+    # t5 = (2n+1)!
+    # t6 = 2 y resultado de error
+    # ft2; Resultado de formula para una determinada n
+    # ft3; Resultado previo
+    # ft4; Error
+    # ft5; (2n+1)! en float
+    # ft6; Resultado acumulativo (Final)
+    # Inicializacion
+	fmv.s ft7 fa0						# ft7 = fa0 = x
     la t0 error
-    flw ft1 0(t0)						# ft1 = 0.001
-    li t0 0								# t0 variable contador n
-    li t1 2								# t2 = 2
-  	sin_bucle:
-    	mul t3 t0 t2					# t3 = t0 * t2 = 2n
-        addi t3 t3 1					# t3 = t3 + 1 = 2n + 1
-        mv a0 t3
-        jal ra factorial				# factorial(t3); a0 = (2n+1)!
-        mv t3 a0						# t3 = a0 = (2n+1)!
-    	jal ra elevar					# elevar(fa0, a0); fa0 = x^(2n+1)
-        fmv.w.x ft3 t3					# ft3 = t3 = (2n+1)! 
-        fdiv.s ft4 fa0 ft3				# ft4 = ft0 / ft3 = (x^(2n+1))/(2n+1)!
-        rem t3 t0 t1					# t3 = t0 % t1 = n % 2
-    	beq t3 zero sin_else			# if t3 != 0:
-        fsub.s ft5 ft5 ft4				# ft5 -= ft4; ft5: respuesta actual
-        sin_else: fadd.s ft5 ft5 ft4	# else: ft5 += ft4; ft5: respuesta actual
-        addi t0 t0 1					# t0 += 1; n += 1; actualizar contador
-        fsub.s ft7 ft5 ft6				# ft7 = ft5 - ft6; ft7: error, ft6: respuesta previa
-        fabs.s ft7 ft7					# ft7 = |ft5 -ft6| = |respuesta actual - respuesta previa| = error
-        flt.s t3 ft7 ft1				# if ft7 < ft1; if error < 0.001
-        bne t3 zero sin_final			# break
-        fmv.s ft6 ft5					# ft6 = ft5; respuesta previa = respuesta actual
+    flw ft8 0(t0)						# ft8 = 0.001
+    li t3 0                             # t3 = 0; Variable contador n
+    sin_bucle:
+        li t6 2                         # t6 = 2
+        mul t4 t3 t6                    # t4 = t3 * t6 = 2n
+        addi t4 t4 1                    # t4 = t4 + 1 = 2n + 1
+        mv a0 t4                        # Parametro t4
+        jal ra factorial                # factorial(t4) => a0 = (2n+1)!
+        mv t5 a0                        # t5 = (2n+1)!
+        fmv.s fa0 ft7                   # Parametro fa0 = ft7 = x
+        mv a0 t4                        # Parametro a0 = t4 = 2n+1
+        jal ra elevar                   # elevar(x, 2n+1) => fa0 = x^(2n+1)
+        # Pierdo valores de ft0 y ft1 al llamar a elevar()
+        fmv.s ft2 fa0                   # ft2 = fa0 = x^(2n+1)
+        fmv.x.w ft5 t5                  # ft5 = ft2 = (2n+1)!
+        fdiv.s ft2 ft2 ft5              # ft2 = ft2/ft5 =(x^(2n+1))/(2n+1)!
+        rem t4 t3 t6                    # t4 = t3 % t6 = n % 2
+        bne t4 zero sin_else            # if n % 2 == 0:
+            fadd.s ft6 ft6 ft2          # ft6 += ft2
+        sin_else:                       # else:
+            fsub.s ft6 ft6 ft2          # ft6 -= ft2
+        fsub.s ft4 ft2 ft3              # ft4 = ft2 - ft3; Error = resultado actual - resultado previo 
+        fabs.s ft4 ft4                  # ft4 = |ft4|; error = |error|
+        addi t0 t0 1                    # Incremento contador
+        flt.s t6 ft4 ft8                # if error < 0.001:
+        bne t6 zero sin_final           # break
+        j sin_bucle                     # Bucle
     sin_final:
-    	fmv.s fa0 ft5					# return ft5; return respuesta actual
-        jr ra
-	
+        fmv.s fa0 ft6                   # Return ft6
+        # Resetear registros
+        li t0 0
+        li t1 0
+        li t2 0
+        li t6 0
+        fmv.x.w ft0 zero
+        fmv.x.w ft1 zero
+        fmv.x.w ft2 zero
+        fmv.x.w ft3 zero
+        fmv.x.w ft4 zero
+        fmv.x.w ft5 zero
+        fmv.x.w ft6 zero
+        fmv.x.w ft7 zero
+        fmv.x.w ft8 zero
+        jr ra                           # Return
+
+
 # Funciones auxiliares
-elevar: #x^n; x = fa0; n = a0; Solo admite positivos y n enteros
+elevar: #x^n; x = fa0; n = a0; Solo admite positivos y n enteros; Usa registros t0 t1 ft0 ft1
 	mv t0 a0							# t0 = n
-    fmv.s ft0 fa0						# ft0 = x
+    fmv.s ft0 fa0						# ft0 = x; constante
+    fmv.s ft1 fa0						# ft1 = x; solucion
     # Si n = 0 return 1
     li a0 1
     beq t0 zero elevar_final			
@@ -56,10 +90,17 @@ elevar: #x^n; x = fa0; n = a0; Solo admite positivos y n enteros
     elevar_bucle: 					
     	beq t0 t1 elevar_final			# While t0 != 1:
         addi t0 t0 -1					# t0 -= 1
-        fmul.s fa0 fa0 ft0				# fa0 *= ft0
+        fmul.s ft1 ft1 ft0				# ft1 *= ft0
         j elevar_bucle
-    elevar_final: jr ra
-factorial: #x!; a0 = x Solo admite enteros
+    elevar_final:
+        fmv.s fa0 ft1                       #return ft1
+        # Resetear registros temporales
+        li t0 0
+        li t1 0
+        fmv.x.w ft0 zero
+        fmv.x.w ft1 zero
+        jr ra
+factorial: #x!; a0 = x Solo admite enteros; Usa registros t0 t1 t2
 	mv t0 a0 						    # t0 = x
     # Retorna 1 si x = 0
     li a0 1
@@ -72,5 +113,11 @@ factorial: #x!; a0 = x Solo admite enteros
         addi t1 t1 -1				    # Restar contador n -= 1
         mul a0 a0 t1				    # a0 = a0 * t1; retorno = retorno * n
         j factorial_bucle
-    factorial_final: jr ra			# Retorna a0
+    factorial_final: 
+        # Resetear registros
+        li t0 0
+        li t1 0
+        li t2 0
+        jr ra			# Retorna a0
+
     
