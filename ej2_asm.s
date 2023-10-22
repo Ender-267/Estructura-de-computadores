@@ -1,8 +1,23 @@
 .data
+	.align 2
+null:  .zero 20
+# m = 2 n = 3
+mat: .float 2
+    .float 3
+    .float 4
 
-
+    .float -2
+    .float -1
+    .float -2.5
+null2: .zero 64
+b:  .zero 100
 .text
 main:
+	la a0 mat
+	la a1 b
+    li a2 3
+    li a3 2
+    jal ra SinMatrix
     li a7 10
     ecall
 SinMatrix: #a0 = A a1 = B a2 = N a3 = M
@@ -20,7 +35,6 @@ SinMatrix: #a0 = A a1 = B a2 = N a3 = M
             add t6 t6 a0                # t6 = A + (i*n + j) * 4
             flw fa0 0(t6)               # Pasamos parametro
             # Guardamos todos los valores que seran sobreescritos por sin() en la pila
-            addi sp sp -4
             sw a0 0(sp)
             addi sp sp -4
             sw ra 0(sp)
@@ -30,6 +44,7 @@ SinMatrix: #a0 = A a1 = B a2 = N a3 = M
             sw t5 0(sp)
             addi sp sp -4
             sw t0 0(sp)
+            addi sp sp -4
 
             jal ra sin                  # Seno de la palabra en (i*n + j)*4
             # Restauramos valores
@@ -52,6 +67,16 @@ SinMatrix: #a0 = A a1 = B a2 = N a3 = M
         addi t4 t4 1
         j bucle_1
     final_1:
+    # Resetear registros
+    li a0 0
+    li a1 0
+    li a2 0
+    li a3 0
+    li t0 0
+    li t4 0
+    li t5 0
+    li t1 0
+    li t6 0
     jr ra
     
 
