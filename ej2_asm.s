@@ -1,25 +1,3 @@
-.data
-	.align 2
-null:  .zero 20
-# m = 2 n = 3
-mat: .float 2
-    .float 3
-    .float 4
-
-    .float -2
-    .float -1
-    .float -2.5
-null2: .zero 64
-b:  .zero 100
-.text
-main:
-	la a0 mat
-	la a1 b
-    li a2 3
-    li a3 2
-    jal ra SinMatrix
-    li a7 10
-    ecall
 SinMatrix: #a0 = A a1 = B a2 = N a3 = M
     li t4 0                             # t4; Contador i
 
