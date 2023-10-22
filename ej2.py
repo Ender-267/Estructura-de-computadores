@@ -28,7 +28,7 @@ while i != m:
         j += 1
     i += 1
 
-def main():
+def SinMatriz(direccion_a, direccion_b, n, m):
     i = 0
     while i != m:
         j = 0
@@ -58,5 +58,5 @@ def t_print():
 
 
 
-main()
+SinMatriz()
 t_print()

@@ -46,7 +46,7 @@ class Main:
         return ans_actual
     
     def tg(self, x: float) -> float:
-        if self.cos(x) < 0.0001: return float('inf')
+        if abs(self.cos(x)) < 0.0001: return float('inf')
         return self.sin(x)/self.cos(x)
     
     def e(self) -> float:
