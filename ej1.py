@@ -6,7 +6,7 @@ class Main:
         ans_actual = 0
         ans_previa = 0
         error = 0
-        error_permitido = 0.001
+        error_permitido = 0.0001
         n = 0
         while True:
             operacion1 = 2 * n #2n
@@ -28,7 +28,7 @@ class Main:
         ans_actual = 0
         ans_previa = 0
         error = 0
-        error_permitido = 0.001
+        error_permitido = 0.0001
         n = 0
         while True:
             operacion1 = 2 * n #2n
@@ -46,8 +46,7 @@ class Main:
         return ans_actual
     
     def tg(self, x: float) -> float:
-        if self.cos(x) == 0 and self.sen(x) > 0: return float('inf')
-        if self.cos(x) == 0 and self.sen(x) < 0: return float('-inf')
+        if self.cos(x) < 0.0001: return float('inf')
         return self.sin(x)/self.cos(x)
     
     def e(self) -> float:

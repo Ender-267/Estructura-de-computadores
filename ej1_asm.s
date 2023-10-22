@@ -1,10 +1,7 @@
 .data
 	.align 2
 # Constantes
-error: .float 0.001
 pi:	   .word 0x40490FDB
-inf:   .word 0x7F800000
-ninf:  .word 0xFF800000
 # Pruebas
 prueba1: .float -2
 prueba2: .float -1.5
@@ -169,7 +166,7 @@ main:
     fmv.s fa0 fs2
     jal ra tg
 
-
+    jal ra E
 
     # Finalizar programa
     li a7 10
@@ -178,7 +175,7 @@ main:
 sin: #sin(x); x = fa0
     # ft0 y ft1 son usados por elevar()
     # ft7 = x
-    # ft8 = 0.001; Error
+    # ft8 = 0.0001; Error (Usamos error menor que el pedido para el calculo de la tangente)
     # ft9 = ra;
     # t0, t1, t2 son usados por elevar y factorial
     # t3 = n; variable contador
@@ -192,8 +189,8 @@ sin: #sin(x); x = fa0
     # ft6; Resultado acumulativo (Final)
     # Inicializacion
 	fmv.s ft7 fa0						# ft7 = fa0 = x
-    la t0 error
-    flw ft8 0(t0)						# ft8 = 0.001
+    li t0 0x38D1B717                    # t0 = float(0.0001)
+    fmv.w.x ft8 t0						# ft8 = 0.0001
     li t3 0                             # t3 = 0; Variable contador n
     sin_bucle:
         li t6 2                         # t6 = 2
@@ -220,7 +217,7 @@ sin: #sin(x); x = fa0
         fsub.s ft4 ft6 ft3              # ft4 = ft2 - ft3; Error = resultado actual - resultado previo 
         fabs.s ft4 ft4                  # ft4 = |ft4|; error = |error|
         addi t3 t3 1                    # Incremento contador
-        flt.s t6 ft4 ft8                # if error < 0.001:
+        flt.s t6 ft4 ft8                # if error < 0.0001:
         bne t6 zero sin_final           # break
         fmv.s ft3 ft6					# Resultado previo = resultado actual
         j sin_bucle                     # Bucle
@@ -247,7 +244,7 @@ sin: #sin(x); x = fa0
 cos: #cos(x); x = fa0
     # ft0 y ft1 son usados por elevar()
     # ft7 = x
-    # ft8 = 0.001; Error
+    # ft8 = 0.0001; Error (Usamos error menor que el pedido para el calculo de la tangente)
     # ft9 = ra;
     # t0, t1, t2 son usados por elevar y factorial
     # t3 = n; variable contador
@@ -261,8 +258,8 @@ cos: #cos(x); x = fa0
     # ft6; Resultado acumulativo (Final)
     # Inicializacion
 	fmv.s ft7 fa0						# ft7 = fa0 = x
-    la t0 error
-    flw ft8 0(t0)						# ft8 = 0.001
+    li t0 0x38D1B717                    # t0 = float(0.0001)
+    fmv.w.x ft8 t0						# ft8 = 0.0001
     li t3 0                             # t3 = 0; Variable contador n
     cos_bucle:
         li t6 2                         # t6 = 2
@@ -288,7 +285,7 @@ cos: #cos(x); x = fa0
         fsub.s ft4 ft6 ft3              # ft4 = ft2 - ft3; Error = resultado actual - resultado previo 
         fabs.s ft4 ft4                  # ft4 = |ft4|; error = |error|
         addi t3 t3 1                    # Incremento contador
-        flt.s t6 ft4 ft8                # if error < 0.001:
+        flt.s t6 ft4 ft8                # if error < 0.0001:
         bne t6 zero cos_final           # break
         fmv.s ft3 ft6					# Resultado previo = resultado actual
         j cos_bucle                     # Bucle
@@ -329,37 +326,18 @@ tg: #tg(x); fa0 = x
     addi sp sp 4
     flw ft1 0(sp)                       # ft1 = sen(x)
     addi sp sp 4
-    la t1 error
-    flw ft3 0(t1)                       # ft3 = 0.001
+    li t1 0x38D1B717
+    fmv.w.x ft3 t1                      # ft3 = 0.0001
     fabs.s ft4 ft0                      # ft4 = |cos(x)|
     li t1 1                             # t1 = 1
-    la t3 inf
-    flw fa0 0(t3)                       # fa0 = +inf
+    li t3 0x7F800000                    # t3 = inf en float
+    fmv.w.x fa0 t3                      # fa0 = +inf
     fmv.w.x ft2 zero                    # ft2 = 0
-    # If |cos(x)| < 0.001 and sen(x) > 0: return inf
-        flt.s t5 ft4 ft3                    # cos (x) < 0.001  
-        flt.s t6 ft2 ft1                    # 0 < sen(x)
-        beq t5 t1 tg_then_1                 # t1 == 1     
-        j tg_if_2  
-    # If cos(x) == 0 and sen(x) < 0: return -inf
-    tg_if_2:
-        la t3 ninf
-        flw fa0 0(t3)                       # fa0 =-inf
-        flt.s t5 ft4 ft3                    # cos (x) < 0.001   
-        flt.s t6 ft1 ft2                    # sen(x) < 0
-        beq t5 t1 tg_then_2                 # t1 == 1
-        j tg_div
+    # If |cos(x)| < 0.0001 and sen(x) > 0: return inf
+    flt.s t5 ft4 ft3                    # cos (x) < 0.0001  
+    beq t5 t1 tg_final                  # t1 == 1     
 
-    tg_then_1:
-        beq t5 t6 tg_final                      # t0 == t1 == 1
-        j tg_if_2
-
-    tg_then_2:
-        beq t5 t6 tg_final                      # t0 == t1 == 1
-        j tg_div
-
-    tg_div:
-        fdiv.s fa0 ft1 ft0                     # tg(x) = sin(x) / cos (x)
+    fdiv.s fa0 ft1 ft0                     # tg(x) = sin(x) / cos (x)
     tg_final:
         # reiniciar registros
         li t0 0
@@ -377,7 +355,52 @@ tg: #tg(x); fa0 = x
         fmv.w.x ft11 zero
         jr ra                                   # return fa0
 
-
+E: #E();
+    # t0: Error (Se borra al llamar a factorial)
+    # t3: Variable contador
+    # ft2: Error 0.001
+    # ft3: n! y luego 1/n!
+    # ft4 = 1
+    # ft5: Resultado acumulativo
+    # ft6: Resultado previo
+    # ft7: Error actual
+    # ft9: Guardar RA
+    # Inicializacion
+    li t0 0x3A83126F                    # t0 = float(0.001)
+    fmv.w.x ft2 t0						# ft0 = 0.001
+    li t0 1
+    fcvt.s.w ft4 t0                      # ft4 = 1
+    li t3 0                             # t3 = 0; Variable contador n
+    e_bucle:
+        fmv.w.x ft9 ra					# Guardo la ra para futuras llamadas
+        mv a0 t3                        # a0 = n
+        #Pierdo registros t0 t1 t2 ft0 al llamar a factorial
+        jal ra factorial                # factorial(n) => fa0 = n!
+        fmv.s ft3 fa0                   # Parametro fa0 = ft3 = n!
+        fmv.x.w ra ft9
+        fdiv.s ft3 ft4 ft3              # ft3 = ft4/ft3 = 1/n!
+        fadd.s ft5 ft5 ft3              # ft5 += ft3
+        fsub.s ft7 ft5 ft6              # ft7 = ft5 - ft6; Error = resultado actual - resultado previo 
+        fabs.s ft7 ft7                  # ft7 = |ft7|; error = |error|
+        addi t3 t3 1                    # Incremento contador
+        flt.s t0 ft7 ft2                # if error < 0.001:
+        bne t0 zero e_final             # break
+        fmv.s ft6 ft5					# Resultado previo = resultado actual
+        j e_bucle                       # Bucle
+    e_final:
+        fmv.s fa0 ft5                   # Return ft6
+        # Resetear registros
+        li a0 0
+        li t0 0
+        li t1 0
+        fmv.w.x ft9 zero
+        fmv.w.x ft2 zero
+        fmv.w.x ft3 zero
+        fmv.w.x ft4 zero
+        fmv.w.x ft5 zero
+        fmv.w.x ft6 zero
+        fmv.w.x ft7 zero
+        jr ra                           # Return
 
 # Funciones auxiliares
 elevar: #x^n; x = fa0; n = a0; Solo admite positivos y n enteros; Usa registros t0 t1 ft0 ft1
