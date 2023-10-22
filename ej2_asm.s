@@ -1,5 +1,59 @@
+.data
 
 
+.text
+main:
+    li a7 10
+    ecall
+SinMatrix: #a0 = A a1 = B a2 = N a3 = M
+    li t4 0                             # t4; Contador i
+
+
+    bucle_1: beq t4 a3 final_1
+        li t5 0                         # t5; Contador j
+        bucle_2: beq t5 a2 final_2 
+            mul t6 t4 a2                # t6 = i * n
+            add t6 t6 t5                # t6 = i * n + j
+            li t0 4
+            mul t6 t6 t0                # t6 = (i * n + j) * 4
+            mv t0 t6                    # t0 = (i * n + j) * 4
+            add t6 t6 a0                # t6 = A + (i*n + j) * 4
+            flw fa0 0(t6)               # Pasamos parametro
+            # Guardamos todos los valores que seran sobreescritos por sin() en la pila
+            addi sp sp -4
+            sw a0 0(sp)
+            addi sp sp -4
+            sw ra 0(sp)
+            addi sp sp -4
+            sw t4 0(sp)
+            addi sp sp -4
+            sw t5 0(sp)
+            addi sp sp -4
+            sw t0 0(sp)
+
+            jal ra sin                  # Seno de la palabra en (i*n + j)*4
+            # Restauramos valores
+            addi sp sp 4
+            lw t0 0(sp)
+            addi sp sp 4
+            lw t5 0(sp)
+            addi sp sp 4
+            lw t4 0(sp)
+            addi sp sp 4
+            lw ra 0(sp)
+            addi sp sp 4
+            lw a0 0(sp)
+
+            add t6 t0 a1                # t6 = B + (i*n + j) * 4
+            fsw fa0 0(t6)                # Guardamos el resultado en memoria
+            addi t5 t5 1                # j = j + 1
+            j bucle_2
+        final_2:
+        addi t4 t4 1
+        j bucle_1
+    final_1:
+    jr ra
+    
 
 # Funciones auxiliares
 sin: #sin(x); x = fa0
