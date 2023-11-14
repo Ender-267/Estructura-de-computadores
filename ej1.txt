@@ -69,7 +69,30 @@ sc rs1 rs2 rs3{
           (BW=11, TD, TA, W),
           (MA, SELCOP=1010, MC, MB=10, T6, C0),
           (SELA=10000, T9, C1),
-          (BW=11, TD, TA, W),
+          (BW=11, TD, TA, W, A0=1, B=1, C=0),
+      }
+}
+
+lc rs1 rs2 rs3{
+      co=010011,
+      nwords=1,
+      rs1=reg(25,21),
+      rs2=reg(20,16),
+      rs3=reg(15,11),
+      # MAR <- RS3; RT1 <- RS3
+      # MBR <- Mem[MAR]; 
+      # RS1 <- MBR
+      # MAR <- RS3 + 4
+      # MBR <- Mem[MAR]; 
+      # RS2 <- MBR
+      # Fetch
+      {
+          (SELA=01011, T9, C0, C4),      
+          (R, TA, M1, BW=11, C1),
+          (T1, SELC=10101, LC),
+          (MA, SELCOP=01010, MC, MB=10, T6, C0),
+          (R, TA, M1, BW=11, C1),
+          (T1, SELC=10000, LC, A0=1, B=1, C=0),
       }
 }
 
