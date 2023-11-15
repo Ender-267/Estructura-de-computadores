@@ -49,18 +49,32 @@ begin
           (A0=0, B=1, C=0, MADDR=fetch)
 }
 
-# 
-sc rs1 rs2 rs3{
+la rr1 u32{
+      co=010001,
+      nwords=2,
+      rr1=reg(25,21),
+      u32=inm(63,32),
+      # RR1 <- BR[RR1]
+      # Fetch
+
+      # BR[RR1] <- IR
+      # Fetch
+      {
+          
+      }
+}
+
+sc rr1 rr2 rr3{
       co=010010,
       nwords=1,
-      rs1=reg(25,21),
-      rs2=reg(20,16),
-      rs3=reg(15,11),
-      # MAR <- RS3; RT1 <- RS3
-      # MBR <- RS1; 
+      rr1=reg(25,21),
+      rr2=reg(20,16),
+      rr3=reg(15,11),
+      # MAR <- RR3; RT1 <- RR3
+      # MBR <- RR1; 
       # Mem[MAR] <- MBR
-      # MAR <- RS3 + 4
-      # MBR <- RS2
+      # MAR <- RR3 + 4
+      # MBR <- RR2
       # Mem[MAR] <- MBR
       # Fetch
       {
@@ -73,18 +87,18 @@ sc rs1 rs2 rs3{
       }
 }
 
-lc rs1 rs2 rs3{
+lc rr1 rr2 rr3{
       co=010011,
       nwords=1,
-      rs1=reg(25,21),
-      rs2=reg(20,16),
-      rs3=reg(15,11),
-      # MAR <- RS3; RT1 <- RS3
+      rr1=reg(25,21),
+      rr2=reg(20,16),
+      rr3=reg(15,11),
+      # MAR <- RR3; RT1 <- RR3
       # MBR <- Mem[MAR]; 
-      # RS1 <- MBR
-      # MAR <- RS3 + 4
+      # RR1 <- MBR
+      # MAR <- RR3 + 4
       # MBR <- Mem[MAR]; 
-      # RS2 <- MBR
+      # RR2 <- MBR
       # Fetch
       {
           (SELA=01011, T9, C0, C4),      
