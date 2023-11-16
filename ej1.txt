@@ -54,13 +54,13 @@ la rr1 u32{
       nwords=2,
       rr1=reg(25,21),
       u32=inm(63,32),
-      # RR1 <- BR[RR1]
-      # Fetch
-
-      # BR[RR1] <- IR
-      # Fetch
+      # MAR <- PC
+      # PC <- PC + 4; MBR <- Mem[MAR]
+      # RR1 <- MBR; Fetch
       {
-          
+          (T2, C0),
+          (M2, C2, R, TA, M1, BW=11, C1),
+          (SELC=10101, LC, T1, A0=1, B=1, C=0)
       }
 }
 
@@ -75,8 +75,7 @@ sc rr1 rr2 rr3{
       # Mem[MAR] <- MBR
       # MAR <- RR3 + 4
       # MBR <- RR2
-      # Mem[MAR] <- MBR
-      # Fetch
+      # Mem[MAR] <- MBR; Fetch
       {
           (SELA=01011, T9, C0, C4),      
           (SELA=10101, T9, C1),
@@ -98,8 +97,7 @@ lc rr1 rr2 rr3{
       # RR1 <- MBR
       # MAR <- RR3 + 4
       # MBR <- Mem[MAR]; 
-      # RR2 <- MBR
-      # Fetch
+      # RR2 <- MBR; Fetch
       {
           (SELA=01011, T9, C0, C4),      
           (R, TA, M1, BW=11, C1),
@@ -107,6 +105,45 @@ lc rr1 rr2 rr3{
           (MA, SELCOP=01010, MC, MB=10, T6, C0),
           (R, TA, M1, BW=11, C1),
           (T1, SELC=10000, LC, A0=1, B=1, C=0),
+      }
+}
+
+addc rr1 rr2 rr3 rr4{
+      co=010100,
+      nwords=1,
+      rr1=reg(25,21),
+      rr2=reg(20,16),
+      rr3=reg(15,11),
+      rr4=reg(10,6),
+      # RR1 <- RR1 + RR3 (SR)
+      # RR2 <- RR2 + RR4; Fetch
+      {
+          (SELCOP=1010, MC, SELA=10101, SELB=01011, T6, SELC=10101, LC, SELP=11, M7, C7),      
+          (SELCOP=1010, MC, SELA=10000, SELB=00110, T6, SELC=10000, LC, SELP=00, A0=1, B=1, C=0)
+      }
+}
+
+mulc rr1 rr2 rr3 rr4{
+      co=010101,
+      nwords=1,
+      rr1=reg(25,21),
+      rr2=reg(20,16),
+      rr3=reg(15,11),
+      rr4=reg(10,6),
+      # RT1 <- RR1 * RR3
+      # RT2 <- RR2 * RR4
+      # RT3 <- RT1 - RT2 (SR) *****
+      # RT1 <- RR1 * RR4
+      # RT2 <- RR2 * RR3
+      # RR2 <- RT1 + RT2
+      # RR1 <- RT3 *****
+      {
+          (SELCOP=1100 , MC, SELA=10101, SELB=01011, T6, C4),
+          (SELCOP=1100 , MC, SELA=10000, SELB=00110, T6, C5),
+          (SELCOP=1011, MC, MA, MB=01, T6, SELC=10101, LC, SELP=11, M7, C7)
+          (SELCOP=1100 , MC, SELA=10101, SELB=00110, T6, C4),
+          (SELCOP=1100 , MC, SELA=10000, SELB=01011, T6, C5),
+          (SELCOP=1010, MC, MA, MB=01, T6, SELC=10000, LC, A0=1, B=1, C=0)
       }
 }
 
