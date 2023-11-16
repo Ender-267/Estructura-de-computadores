@@ -118,8 +118,8 @@ addc rr1 rr2 rr3 rr4{
       # RR1 <- RR1 + RR3 (SR)
       # RR2 <- RR2 + RR4; Fetch
       {
-          (SELCOP=1010, MC, SELA=10101, SELB=01011, T6, SELC=10101, LC, SELP=11, M7, C7),      
-          (SELCOP=1010, MC, SELA=10000, SELB=00110, T6, SELC=10000, LC, SELP=00, A0=1, B=1, C=0)
+          (SELCOP=01010, MC, SELA=10101, SELB=01011, T6, SELC=10101, LC, SELP=11, M7, C7),      
+          (SELCOP=01010, MC, SELA=10000, SELB=00110, T6, SELC=10000, LC, SELP=00, A0=1, B=1, C=0)
       }
 }
 
@@ -132,24 +132,119 @@ mulc rr1 rr2 rr3 rr4{
       rr4=reg(10,6),
       # RT1 <- RR1 * RR3
       # RT2 <- RR2 * RR4
-      # RT3 <- RT1 - RT2 (SR) *****
+      # RT3 <- RT1 - RT2 (SR)
       # RT1 <- RR1 * RR4
       # RT2 <- RR2 * RR3
       # RR2 <- RT1 + RT2
-      # RR1 <- RT3 *****
+      # RR1 <- RT3; Fetch
       {
-          (SELCOP=1100 , MC, SELA=10101, SELB=01011, T6, C4),
-          (SELCOP=1100 , MC, SELA=10000, SELB=00110, T6, C5),
-          (SELCOP=1011, MC, MA, MB=01, T6, SELC=10101, LC, SELP=11, M7, C7)
-          (SELCOP=1100 , MC, SELA=10101, SELB=00110, T6, C4),
-          (SELCOP=1100 , MC, SELA=10000, SELB=01011, T6, C5),
-          (SELCOP=1010, MC, MA, MB=01, T6, SELC=10000, LC, A0=1, B=1, C=0)
+          (SELCOP=01100 , MC, SELA=10101, SELB=01011, T6, C4),
+          (SELCOP=01100 , MC, SELA=10000, SELB=00110, T6, C5),
+          (SELCOP=01011, MC, MA, MB=01, C6, SELP=11, M7, C7)
+          (SELCOP=01100 , MC, SELA=10101, SELB=00110, T6, C4),
+          (SELCOP=01100 , MC, SELA=10000, SELB=01011, T6, C5),
+          (SELCOP=01010, MC, MA, MB=01, T6, SELC=10000, LC),
+          (T7, SELC=10101, LC, A0=1, B=1, C=0)
       }
 }
 
+beqc rr1 rr2 rr3 rr4 s6{
+      co=110100,
+      nwords=1,
+      rr1=reg(25,21),
+      rr2=reg(20,16),
+      rr3=reg(15,11),
+      rr4=reg(10,6),
+      s6=inm(5,0), 
+      # RT1 <- RR1 - RR3 1011
+      # RT2 <- RR2 - RR4 1011
+      # Z <- !(RT1 OR RT2); SI Z ES 0, SALTAR A beqc_verdadero
+      # Fetch (Falso)
+      # True: 
+      # RT1 <- PC
+      # RT2 <- S6
+      # PC <- RT1 + RT2 
+      # Fetch
+      {
+        (SELCOP=01011, MC, SELA=10101, SELB=01011, T6, C4),
+        (SELCOP=01011, MC, SELA=10000, SELB=00110, T6, C5),
+        (SELCOP=00100, MC, MA, MB=01, SELP=11, M7, C7),
+        (C=110, B=0, A0=0, MADDR=beqc_verdadero)
+        (A0=1, B=1, C=0),
+    beqc_verdadero:
+        (T2, C4),
+        (T3, SIZE=110, C5),
+        (SELCOP=01010, MC, MA, MB=01, T6, C2),
+        (A0=1, B=1, C=0)
+      }
+}
 
+beqc rr1 rr2 rr3 rr4 s6{
+      co=110100,
+      nwords=1,
+      rr1=reg(25,21),
+      rr2=reg(20,16),
+      rr3=reg(15,11),
+      rr4=reg(10,6),
+      s6=inm(5,0), 
+      # RT1 <- RR1 - RR3 1011
+      # RT2 <- RR2 - RR4 1011
+      # Z <- RT1 AND RT2; SI Z ES 0, SALTAR A beqc_verdadero
+      # Fetch (Falso)
+      # True: 
+      # RT1 <- PC
+      # RT2 <- S6
+      # PC <- RT1 + RT2 
+      # Fetch
+      {
+        (SELCOP=01011, MC, SELA=10101, SELB=01011, T6, C4),
+        (SELCOP=01011, MC, SELA=10000, SELB=00110, T6, C5),
+        (SELCOP=00010, MC, MA, MB=01, SELP=11, M7, C7),
+        (C=110, B=0, A0=0, MADDR=beqc_verdadero)
+        (A0=1, B=1, C=0),
+    beqc_verdadero:
+        (T2, C4),
+        (T3, SIZE=110, C5),
+        (SELCOP=01010, MC, MA, MB=01, T6, C2),
+        (A0=1, B=1, C=0)
+      }
+}
+
+call u20{
+      co=100001,
+      nwords=1,
+      u20=inm(19,0),
+      # RA <- PC
+      # PC <- U20
+      {
+        (SELC=1, LC, MR, T2),
+        (SIZE=10011, T3, C2, A0=1, B=1, C=0)
+      }
+
+}
+
+ret{
+      co=100010,
+      nwords=1,
+      # RA <- PC
+      {
+        (SELA=1, MR, T9, C2, A0=1, B=1, C=0)
+      }
+
+}
+
+hcf{
+      co=100011,
+      nwords=1,
+      # PC <- 0; SR <- 0
+      {
+        (C2, C7, EXCODE=0, T11, A0=1, B=1, C=0)
+      }
+
+}
 
 #
+
 # Register naming
 #
 
