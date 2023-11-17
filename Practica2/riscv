@@ -1218,8 +1218,8 @@ pseudoinstructions
         addu rd, rd, sel(11,0,expression)
     }
 
-    # la rd, label        (several expansions)        Load address
-    la rd=reg, label=inm
+    # lao rd, label        (several expansions)        Load address
+    lao rd=reg, label=inm
     {
         lui  rd,     sel(31,12,label)
         addu rd, rd, sel(11,0,label)

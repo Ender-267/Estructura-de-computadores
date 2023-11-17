@@ -3,17 +3,21 @@
     b: .word 10, 20
 .text
 no_ext:
-        lw t0 0(a0)     # t0 = a real
-        addi a0 a0 4      
-        lw t1 0(a0)        # t1 = a imaginario
+        lw t0 0(a0)     # t0 = a real     
+        lw t1 4(a0)     # t1 = a imaginario
 
-        lw t2 0(a1)     # t2 = b real
-        addi a1 a1 4      
-        lw t3 0(a1)        # t3 = b imaginario
+        lw t2 0(a1)     # t2 = b real      
+        lw t3 4(a1)     # t3 = b imaginario
 
-        bne t0 t2 else_1  # if (a real = b real) y (a imaginario = b imaginario)
-        bne t1 t3 else_1
-
+        beq t0 t2 con_1  # if (a real = b real) y (a imaginario = b imaginario)
+        j else_1
+    con_1:
+        beq t1 t3 then_1
+    else_1:
+        add a0 t0 t2    # resultado real = t0 + t2
+        add a1 t1 t3    # resultado imaginario = t1 + t3
+        j fin_1
+    then_1:
         mul t5 t0 t2
         mul t6 t1 t3
         sub a0 t5 t6    # resultado real = t0 * t2 - t1 * t3
@@ -22,31 +26,19 @@ no_ext:
         mul t6 t1 t2
         add a1 t5 t6    # resultado imaginario = t0 * t3 + t1 * t2
 
-        j fin_1
-    else_1:
-
-        add a0 t0 t2    # resultado real = t0 + t2
-        add a1 t1 t3    # resultado imaginario = t1 + t3
-
-    fin_1: ret
+    fin_1: jr ra
 with_ext:
-        lw t0 0(a0)     # t0 = a real
-        addi a0 a0 4      
-        lw a0 0(a0)        # a0 = a imaginario
+        mv t0 a1
+        lc a0 a1 a0         # a0 = a real; a1 = a imaginario
+        lc t0 t1 t0         # t0 = b real; t1 = b imaginario
 
-        lw t1 0(a1)     # t1 = b real
-        addi a1 a1 4      
-        lw a1 0(a1)        # a1 = b imaginario
-
-        beqc t0 a0 t1 a1 8   # if a == b
+        beqc a0 a1 t0 t1 then_2   # if a == b
         # Else
-        addc t0 a0 t1 a1    # a + b
+        addc a0 a1 t0 t1    # a + b
         j fin_2
-        # Then
-        mulc t0 a0 t1 a1    # a * b
+    then_2:
+        mulc a0 a1 t0 t1    # a * b
     fin_2: 
-        mv a0 t0
-        mv a1 t1
         ret
 
 main: 
