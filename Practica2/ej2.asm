@@ -1,6 +1,7 @@
 .data
     a: .word 35, 15
     b: .word 10, 20
+    resultado: .zero 4
 .text
 no_ext:
         lw t0 0(a0)     # t0 = a real     
@@ -26,7 +27,13 @@ no_ext:
         mul t6 t1 t2
         add a1 t5 t6    # resultado imaginario = t0 * t3 + t1 * t2
 
-    fin_1: jr ra
+    fin_1:
+        # Prueba de SC (No necesario)
+        # la t0 resultado
+        # sw a0 0(t0)
+        # addi t0 t0 4
+        # sw a1 0(t0) 
+        jr ra
 with_ext:
         mv t0 a1
         lc a0 a1 a0         # a0 = a real; a1 = a imaginario
@@ -38,7 +45,10 @@ with_ext:
         j fin_2
     then_2:
         mulc a0 a1 t0 t1    # a * b
-    fin_2: 
+    fin_2:
+        # Prueba de SC (No necesario)
+        # la t0 resultado
+        # sc a0 a1 t0
         ret
 
 main: 
