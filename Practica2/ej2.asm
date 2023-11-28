@@ -1,7 +1,7 @@
 .data
     a: .word 35, 15
     b: .word 10, 20
-    resultado: .zero 4  # Para probar SC, mirar codigo comentado
+    resultado: .zero 8  # Para probar SC, mirar codigo comentado
 .text
 no_ext:
         lw t0 0(a0)     # t0 = a real     
