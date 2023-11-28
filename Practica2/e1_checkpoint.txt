@@ -112,9 +112,10 @@ beqc rr1 rr2 rr3 rr4 s6{
       # RT1 <- RR1 - RR3
       # RT2 <- RR2 - RR4
       # MBR <- SR
-      # Z <- !(RT1 OR RT2); SI Z ES 0, SALTAR A beqc_verdadero (Se actualiza SR)
+      # Z <- !(RT1 OR RT2)
+      # SI Z ES 0, SALTAR A beqc_verdadero (Se actualiza SR)
       # Fetch (Si da Falso)
-      # SR <- MBR (Restaurar SR)
+      # MBR <- SR (Guardar SR)
       # beqc_verdadero: 
       # RT1 <- PC
       # RT2 <- S6
