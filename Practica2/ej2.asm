@@ -31,8 +31,7 @@ no_ext:
         # Prueba de SC (No necesario)
         # la t0 resultado
         # sw a0 0(t0)
-        # addi t0 t0 4
-        # sw a1 0(t0) 
+        # sw a1 4(t0) 
         jr ra
 with_ext:
         mv t0 a1
