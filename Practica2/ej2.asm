@@ -1,7 +1,7 @@
 .data
     a: .word 35, 15
     b: .word 10, 20
-    resultado: .zero 4
+    resultado: .zero 4  # Para probar SC, mirar codigo comentado
 .text
 no_ext:
         lw t0 0(a0)     # t0 = a real     
@@ -10,10 +10,10 @@ no_ext:
         lw t2 0(a1)     # t2 = b real      
         lw t3 4(a1)     # t3 = b imaginario
 
-        beq t0 t2 con_1  # if (a real = b real) y (a imaginario = b imaginario)
+        beq t0 t2 con_1  # if (a real = b real) 
         j else_1
     con_1:
-        beq t1 t3 then_1
+        beq t1 t3 then_1 # if (a imaginario = b imaginario)
     else_1:
         add a0 t0 t2    # resultado real = t0 + t2
         add a1 t1 t3    # resultado imaginario = t1 + t3
