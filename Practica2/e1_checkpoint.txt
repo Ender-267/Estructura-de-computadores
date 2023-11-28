@@ -109,11 +109,13 @@ beqc rr1 rr2 rr3 rr4 s6{
       rr3=reg(15,11),
       rr4=reg(10,6),
       s6=address(5,0)rel, 
-      # RT1 <- RR1 - RR3 1011
-      # RT2 <- RR2 - RR4 1011
-      # Z <- !(RT1 OR RT2); SI Z ES 0, SALTAR A beqc_verdadero
-      # Fetch (Falso)
-      # True: 
+      # RT1 <- RR1 - RR3
+      # RT2 <- RR2 - RR4
+      # MBR <- SR
+      # Z <- !(RT1 OR RT2); SI Z ES 0, SALTAR A beqc_verdadero (Se actualiza SR)
+      # SR <- MBR (Restaurar SR)
+      # Fetch (Si da Falso)
+      # beqc_verdadero: 
       # RT1 <- PC
       # RT2 <- S6
       # PC <- RT1 + RT2 
@@ -121,7 +123,9 @@ beqc rr1 rr2 rr3 rr4 s6{
       {
         (SELCOP=01011, MC, SELA=10101, SELB=01011, T6, C4),
         (SELCOP=01011, MC, SELA=10000, SELB=00110, T6, C5),
+        (T8, C1)
         (SELCOP=00100, MC, MA, MB=01, SELP=11, M7, C7),
+        (T1, C7)
         (C=110, B=0, A0=0, MADDR=beqc_verdadero)
         (A0=1, B=1, C=0),
     beqc_verdadero:
