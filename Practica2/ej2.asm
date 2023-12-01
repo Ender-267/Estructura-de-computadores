@@ -55,14 +55,12 @@ main:
         la a0, a
         la a1, b
         call with_ext
-        #break:
         rdcycle s1
         sub s1 s1 s0
         rdcycle s0
         la a0, a
         la a1, b
         call no_ext
-        #break:
         rdcycle s2
         sub s2 s2 s0
         hcf
