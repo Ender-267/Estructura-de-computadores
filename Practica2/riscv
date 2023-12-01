@@ -1346,7 +1346,7 @@ pseudoinstructions
     }
 
     # ret        jalr x0, x1, 0        Return from subroutine
-    ret
+    reto
     {
         jalr zero, ra, 0
     }
